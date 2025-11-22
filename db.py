@@ -1,70 +1,36 @@
 import os
-from dotenv import load_dotenv
+import streamlit as st
 from pymongo import MongoClient
-from pymongo.errors import ConnectionFailure
-
-# Load environment variables
-load_dotenv()
-
-# Get MongoDB URI
-MONGO_URI = os.getenv("MONGO_URI")
-
-if not MONGO_URI:
-    raise ValueError("❌ MONGO_URI not found in .env file!")
-
-# -------------------------------
-# ✅ CONNECT TO MONGODB ATLAS
-# -------------------------------
-def test_connection():
-    """Check if MongoDB connection works."""
-    print("🔄 Trying to connect...")
-    try:
-        client = MongoClient(MONGO_URI, serverSelectionTimeoutMS=5000)
-        client.admin.command("ping")
-        print("✅ SUCCESS! Connected to MongoDB Atlas.")
-        return True
-    except Exception as e:
-        print("❌ FAILED to connect:")
-        print(e)
-        return False
 
 
-# Create global client after connection test
+if "MONGO_URI" in st.secrets:   # Streamlit Cloud
+    MONGO_URI = st.secrets["MONGO_URI"]
+
+elif "MONGO_URI" in os.environ:  # Local .env
+    MONGO_URI = os.environ["MONGO_URI"]
+
+else:
+    raise ValueError("❌ MONGO_URI not found in Streamlit Secrets or .env file!")
+
+
 client = MongoClient(MONGO_URI)
+db = client["LinkedIn_posts_db"]
 
-# -------------------------------
-# ✅ DATABASE & COLLECTIONS
-# -------------------------------
-db = client["LinkedIn_posts_db"]        # Change if your DB name differs
+# Collections
 influencers_col = db["influencers"]
 posts_col = db["posts"]
 
 
-# -------------------------------
-# ✅ BASIC INSERT FUNCTIONS
-# -------------------------------
-
-def insert_influencer(data: dict):
-    """Insert one influencer."""
-    return influencers_col.insert_one(data)
-
-
-def insert_post(data: dict):
-    """Insert one processed post."""
-    return posts_col.insert_one(data)
-
-
-# -------------------------------
-# ✅ GET DATA FUNCTIONS
-# -------------------------------
-
 def get_all_influencers():
-    """Get list of all influencers."""
     return list(influencers_col.find({}, {"_id": 0}))
 
+def insert_influencer(data: dict):
+    return influencers_col.insert_one(data)
+
+def insert_post(data: dict):
+    return posts_col.insert_one(data)
 
 def get_filtered_posts(influencer=None, language=None, length=None, tag=None):
-    """Fetch posts using filters."""
     query = {}
 
     if influencer:
@@ -77,5 +43,3 @@ def get_filtered_posts(influencer=None, language=None, length=None, tag=None):
         query["tags"] = tag
 
     return list(posts_col.find(query, {"_id": 0}))
-
-test_connection()
