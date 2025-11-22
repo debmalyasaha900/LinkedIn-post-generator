@@ -1,7 +1,6 @@
 # 🔗 LinkedIn Post Generator  
 AI-powered tool to generate high-quality LinkedIn posts inspired by top influencers.
 
-[![Streamlit App](https://img.shields.io/badge/Launch%20App-Streamlit-brightgreen)]([LinkedIn-Post-Generator](https://linkedin-post-generator-fkj76vlcfhnhku2fdzftbc.streamlit.app/))
 ![Python](https://img.shields.io/badge/Python-3.10-blue)
 ![MongoDB](https://img.shields.io/badge/Database-MongoDB-green)
 ![Streamlit](https://img.shields.io/badge/Framework-Streamlit-red)
